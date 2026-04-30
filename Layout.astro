@@ -1,0 +1,175 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'תכלת וארגמן | כיפות ואביזרים בעבודת יד',
+  description = 'בוטיק מקוון לכיפות ואביזרים יהודיים בעבודת יד. כל פריט נוצר באהבה ובמסירות.',
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Heebo:wght@200;300;400;500&display=swap" rel="stylesheet" />
+  <style is:global>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Warm off-white — like "והדרת" */
+      --parchment:    #F8F4EE;
+      --parchment-2:  #F2EBE0;
+      --parchment-3:  #E8DDD0;
+      --ink:          #1C1410;
+      --ink-2:        #2E2218;
+      --ink-light:    #6B5A4A;
+      --gold:         #B8933A;
+      --gold-light:   #D4AE6A;
+      --gold-pale:    #F0E4C8;
+      --teal:         #4E8FA0;   /* brand accent from logo */
+      --border:       #DDD3C5;
+      --border-dark:  #C4B5A5;
+
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body:    'Heebo', sans-serif;
+
+      --max-w: 1200px;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      font-family: var(--ff-body);
+      background: var(--parchment);
+      color: var(--ink);
+      direction: rtl;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ── Utility ── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 2.5rem; }
+    .section { padding: 6rem 0; }
+
+    .eyebrow {
+      font-family: var(--ff-body);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    .display-title {
+      font-family: var(--ff-display);
+      font-weight: 400;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    .rule-gold {
+      width: 48px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--ff-body);
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      padding: 0.85rem 2rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+    }
+    .btn-dark {
+      background: var(--ink);
+      color: var(--parchment);
+    }
+    .btn-dark:hover { background: var(--ink-2); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+      border: 1px solid var(--border-dark);
+    }
+    .btn-outline:hover { border-color: var(--ink); background: var(--parchment-2); }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--parchment);
+    }
+    .btn-gold:hover { background: var(--ink); }
+
+    /* ── Reveal animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 768px) {
+      .container { padding: 0 1.25rem; }
+      .section { padding: 4rem 0; }
+    }
+  </style>
+</head>
+<body>
+  <slot />
+  <script>
+    // Scroll reveal
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+    );
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Sticky header
+    const hdr = document.getElementById('site-header');
+    if (hdr) {
+      window.addEventListener('scroll', () => {
+        hdr.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+    }
+
+    // Mobile nav
+    const ham = document.getElementById('hamburger');
+    const nav = document.getElementById('mobile-nav');
+    const overlay = document.getElementById('nav-overlay');
+    if (ham && nav && overlay) {
+      const toggle = () => {
+        nav.classList.toggle('open');
+        overlay.classList.toggle('open');
+        ham.classList.toggle('open');
+      };
+      ham.addEventListener('click', toggle);
+      overlay.addEventListener('click', toggle);
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', toggle));
+    }
+
+    // Back to top
+    const btt = document.getElementById('back-top');
+    if (btt) {
+      window.addEventListener('scroll', () => btt.classList.toggle('show', window.scrollY > 500), { passive: true });
+      btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+  </script>
+</body>
+</html>
